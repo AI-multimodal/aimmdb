@@ -1,5 +1,6 @@
 from datetime import datetime
 from enum import Enum
+from ossaudiodev import control_labels
 from typing import Dict, Generic, List, Optional, TypeVar, Union
 
 import pydantic
@@ -102,6 +103,7 @@ class XDIElement(pydantic.BaseModel):
 class MeasurementEnum(str, Enum):
     xas = "xas"
     rixs = "rixs"
+    feff = "feff"
 
 
 class FacilityMetadata(pydantic.BaseModel, extra=pydantic.Extra.allow):
@@ -131,6 +133,70 @@ class ExperimentalXASMetadata(pydantic.BaseModel, extra=pydantic.Extra.allow):
     facility: FacilityMetadata
     beamline: BeamlineMetadata
 
+class FEFFatoms(pydantic.BaseModel):
+    atoms_values: float
+
+class FEFFcontrol(pydantic.BaseModel):
+    control_labels: int
+
+class FEFFexchange(pydantic.BaseModel):
+    exchange_values: float
+
+class FEFFtitle(pydantic.BaseModel):
+    file_title: Optional[str]
+
+class FEFFrpath(pydantic.BaseModel):
+    rpath_value: int
+
+class FEFFpotentials(pydantic.BaseModel):
+    x: Optional[str]
+    ipot: int
+    Z: str
+    element: int
+    l_scmt: int
+    l_fms: int
+
+class FEFFxanes(pydantic.BaseModel):
+    xanes: float
+
+class FEFFedge(pydantic.BaseModel):
+    edge: str
+
+class FEFFscf(pydantic.BaseModel):
+    scf: float
+
+class FEFFfms(pydantic.BaseModel):
+    fms: float
+
+class FEFFS02(pydantic.BaseModel):
+    S02: float
+
+class FEFFcorehole(pydantic.BaseModel):
+    corehole: str    
+
+class ExperimentalFEFFMetadata(pydantic.BaseModel, extra=pydantic.Extra.allow):
+    atoms: FEFFatoms
+    control: FEFFcontrol
+    exchange: FEFFexchange
+    title: FEFFtitle
+    rpath: FEFFrpath
+    potentials: FEFFpotentials
+    xanes: FEFFxanes
+    edge: FEFFedge
+    scf: FEFFscf
+    fms: FEFFfms
+    S02: FEFFS02
+    corehole: FEFFcorehole
+
+class FEFFDataframe(pydantic.BaseModel):
+    omega: float
+    e: float
+    k: float
+    mu: float
+    mu0: float
+    chi: float
+
+   #need to write validation for the Dataframe
 
 class ChargeEnum(str, Enum):
     C = "C"
