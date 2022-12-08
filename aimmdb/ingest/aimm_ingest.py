@@ -114,9 +114,7 @@ def parse_filename_nslsii(name):
             cycle = 10
         else:
             # raise KeyError(f"unable to parse cycle from {name}")
-            cycle = (
-                1  # In Eli's dataset, files with no cycle value in the filename
-            )
+            cycle = 1  # In Eli's dataset, files with no cycle value in the filename
             # are assumed to be cycle = 1
 
         if "4_3" in name:
@@ -375,9 +373,7 @@ def ingest_aimm_ncm_wanli(c, sample_ids, data_path):
             uid = results.values().first().item["id"]
             del c_uid[uid]
             c_uid.write_dataframe(
-                df,
-                metadata,
-                specs=["XAS_TEY", "XAS_TFY", "HasBatteryChargeData"],
+                df, metadata, specs=["XAS_TEY", "XAS_TFY", "HasBatteryChargeData"]
             )
         else:
             print(f"{fname} is not part of the database")
@@ -388,9 +384,7 @@ def ingest_aimm_ncm_eli(c, sample_ids, data_path):
     files = list(data_path.glob("*.txt"))
 
     for file in files:
-        fname = (
-            file.stem
-        )  # source of data comes from two different files .dat and .txt
+        fname = file.stem  # source of data comes from two different files .dat and .txt
         print(fname)
 
         try:
@@ -422,9 +416,7 @@ def ingest_aimm_ncm_eli(c, sample_ids, data_path):
 
         # print(df.head())
         # print(sample_name, sample_id, metadata["element"])
-        c_uid.write_dataframe(
-            df, metadata, specs=["XAS", "HasBatteryChargeData"]
-        )
+        c_uid.write_dataframe(df, metadata, specs=["XAS", "HasBatteryChargeData"])
 
 
 def ingest_aimm_ncm_gihyeok(c, sample_ids, data_path):
@@ -744,7 +736,6 @@ def ingest_aimm_ncm_gihyeok_oxygen(c, sample_ids, data_path):
 
 
 def ingest_aimm_ncm_vasp(data_path):
-
     file = data_path / "xas_nmc_vasp.json"
     if file.is_file():
         with open(file, "r") as f:
@@ -753,10 +744,7 @@ def ingest_aimm_ncm_vasp(data_path):
             meta = {}
             if file_data["energy"].keys() == file_data["intensity"].keys():
                 for key, values in file_data["energy"].items():
-                    d[key] = {
-                        "energy": values,
-                        "mutrans": file_data["intensity"][key],
-                    }
+                    d[key] = {"energy": values, "mutrans": file_data["intensity"][key]}
                     ###
                     meta[key] = {
                         "dataset": "sim_nmc",
@@ -809,9 +797,7 @@ def ingest_aimm_ncm_feff(c, data_path):
                     print(f"failed to extract structure from id: {key}")
 
                 # meta.append(metadata)
-                c_uid.write_dataframe(
-                    spectrum[key], meta[key], specs=["simulation"]
-                )
+                c_uid.write_dataframe(spectrum[key], meta[key], specs=["simulation"])
                 print(file.name, key, structure_id)
 
             # return file_data
@@ -853,9 +839,7 @@ def ingest_aimm_ncm_sim_xanes(c, data_path, start):
                 try:
                     structure_id = (
                         c["dataset"]["nmc_sim_structure"]["uid"]
-                        .search(
-                            Key("file.id") == str(file_data[i]["structure_id"])
-                        )
+                        .search(Key("file.id") == str(file_data[i]["structure_id"]))
                         .keys()
                         .first()
                     )  # Get unique id generated in the server for the structure
@@ -873,6 +857,51 @@ def ingest_aimm_ncm_sim_xanes(c, data_path, start):
                         print(f"Empty: {i} - {file_data[i]['structure_id']}")
 
             return file_data
+
+
+def update_alignment_ncm_wanli(c):
+
+    alignments = {
+        "FVHEqkxTqz8": {"name": "BM_NCM622", "offset": -0.278},
+        "SNH7Dg7PR9h": {"name": "BM_NCM712-Al", "offset": -0.278},
+        "f6pVatZS3D9": {"name": "BM_NCMA", "offset": -0.278},
+        "4FToXZNyQBr": {"name": "BM_NCM712", "offset": -1.135},
+    }
+
+    for key, value in alignments.items():
+        spectra = c["dataset"]["nmc"]["element"]["Ni"]["edge"]["L3"]["sample"][key][
+            "uid"
+        ].search(Key("facility.name") == "ALS")
+        for spectra_key, spectra_value in spectra.items():
+            metadata = dict(spectra_value.metadata)
+            if "energy_offset" not in metadata:
+                # Remove auto-generated entries in metadata of old node. Server will create new entries for new node
+                metadata.pop("_tiled")
+                metadata.pop("sample")
+
+                metadata["energy_offset"] = value["offset"]
+
+                df = spectra_value.read()
+                df = df + value["offset"]
+
+                if "tey" in df.columns:
+                    specs = ["XAS_TEY", "XAS_TFY", "HasBatteryChargeData"]
+                else:
+                    specs = ["XAS", "HasBatteryChargeData"]
+
+                old_uid = spectra_value.uid
+
+                del c["uid"][spectra_key]
+
+                c["uid"].write_dataframe(df, metadata, specs=specs)
+
+                new_node = (
+                    c["uid"].search(Key("fname") == metadata["fname"]).values().first()
+                )
+
+                print(f"Node updated from {old_uid} to {new_node.uid}")
+            else:
+                print(f"Skipped: alignment has been updated previously - {spectra_key}")
 
 
 def validate_files(c, data_path):
