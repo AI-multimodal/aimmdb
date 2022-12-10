@@ -100,10 +100,12 @@ def parse_filename_nslsii(name):
         sample = "BM_NCMA"
     elif "712" in name or "721" in name:
         sample = "BM_NCM712-Al"
+    elif "811" in name:
+        sample = "BM_NCM811"
     else:
         raise KeyError(f"unable to parse sample from {name}")
 
-    if "pristine" in name:
+    if "pristine" in name or "Pristine" in name:
         charge = (0, 0.0, "DC")
     else:
         if "1st" in name:
@@ -114,16 +116,18 @@ def parse_filename_nslsii(name):
             cycle = 10
         else:
             # raise KeyError(f"unable to parse cycle from {name}")
-            cycle = 1  # In Eli's dataset, files with no cycle value in the filename
+            cycle = (
+                1  # In Eli's dataset, files with no cycle value in the filename
+            )
             # are assumed to be cycle = 1
 
-        if "4_3" in name:
+        if "4_3" in name or "43C" in name:
             voltage = 4.3
             state = "C"
-        elif "4_8" in name:
+        elif "4_8" in name or "48C" in name:
             voltage = 4.8
             state = "C"
-        elif "3V" in name or "3_0" in name:
+        elif "3V" in name or "3_0" in name or "30DC" in name:
             voltage = 3.0
             state = "DC"
         else:
@@ -373,7 +377,9 @@ def ingest_aimm_ncm_wanli(c, sample_ids, data_path):
             uid = results.values().first().item["id"]
             del c_uid[uid]
             c_uid.write_dataframe(
-                df, metadata, specs=["XAS_TEY", "XAS_TFY", "HasBatteryChargeData"]
+                df,
+                metadata,
+                specs=["XAS_TEY", "XAS_TFY", "HasBatteryChargeData"],
             )
         else:
             print(f"{fname} is not part of the database")
@@ -384,7 +390,9 @@ def ingest_aimm_ncm_eli(c, sample_ids, data_path):
     files = list(data_path.glob("*.txt"))
 
     for file in files:
-        fname = file.stem  # source of data comes from two different files .dat and .txt
+        fname = (
+            file.stem
+        )  # source of data comes from two different files .dat and .txt
         print(fname)
 
         try:
@@ -416,7 +424,9 @@ def ingest_aimm_ncm_eli(c, sample_ids, data_path):
 
         # print(df.head())
         # print(sample_name, sample_id, metadata["element"])
-        c_uid.write_dataframe(df, metadata, specs=["XAS", "HasBatteryChargeData"])
+        c_uid.write_dataframe(
+            df, metadata, specs=["XAS", "HasBatteryChargeData"]
+        )
 
 
 def ingest_aimm_ncm_gihyeok(c, sample_ids, data_path):
@@ -744,7 +754,10 @@ def ingest_aimm_ncm_vasp(data_path):
             meta = {}
             if file_data["energy"].keys() == file_data["intensity"].keys():
                 for key, values in file_data["energy"].items():
-                    d[key] = {"energy": values, "mutrans": file_data["intensity"][key]}
+                    d[key] = {
+                        "energy": values,
+                        "mutrans": file_data["intensity"][key],
+                    }
                     ###
                     meta[key] = {
                         "dataset": "sim_nmc",
@@ -797,7 +810,9 @@ def ingest_aimm_ncm_feff(c, data_path):
                     print(f"failed to extract structure from id: {key}")
 
                 # meta.append(metadata)
-                c_uid.write_dataframe(spectrum[key], meta[key], specs=["simulation"])
+                c_uid.write_dataframe(
+                    spectrum[key], meta[key], specs=["simulation"]
+                )
                 print(file.name, key, structure_id)
 
             # return file_data
@@ -839,7 +854,9 @@ def ingest_aimm_ncm_sim_xanes(c, data_path, start):
                 try:
                     structure_id = (
                         c["dataset"]["nmc_sim_structure"]["uid"]
-                        .search(Key("file.id") == str(file_data[i]["structure_id"]))
+                        .search(
+                            Key("file.id") == str(file_data[i]["structure_id"])
+                        )
                         .keys()
                         .first()
                     )  # Get unique id generated in the server for the structure
@@ -869,9 +886,9 @@ def update_alignment_ncm_wanli(c):
     }
 
     for key, value in alignments.items():
-        spectra = c["dataset"]["nmc"]["element"]["Ni"]["edge"]["L3"]["sample"][key][
-            "uid"
-        ].search(Key("facility.name") == "ALS")
+        spectra = c["dataset"]["nmc"]["element"]["Ni"]["edge"]["L3"]["sample"][
+            key
+        ]["uid"].search(Key("facility.name") == "ALS")
         for spectra_key, spectra_value in spectra.items():
             metadata = dict(spectra_value.metadata)
             if "energy_offset" not in metadata:
@@ -882,7 +899,7 @@ def update_alignment_ncm_wanli(c):
                 metadata["energy_offset"] = value["offset"]
 
                 df = spectra_value.read()
-                df = df + value["offset"]
+                df["energy"] = df["energy"] + value["offset"]
 
                 if "tey" in df.columns:
                     specs = ["XAS_TEY", "XAS_TFY", "HasBatteryChargeData"]
@@ -896,12 +913,62 @@ def update_alignment_ncm_wanli(c):
                 c["uid"].write_dataframe(df, metadata, specs=specs)
 
                 new_node = (
-                    c["uid"].search(Key("fname") == metadata["fname"]).values().first()
+                    c["uid"]
+                    .search(Key("fname") == metadata["fname"])
+                    .values()
+                    .first()
                 )
 
                 print(f"Node updated from {old_uid} to {new_node.uid}")
             else:
-                print(f"Skipped: alignment has been updated previously - {spectra_key}")
+                print(
+                    f"Skipped: alignment has been updated previously - {spectra_key}"
+                )
+
+
+def ingest_aimm_ncm_gihyeok_811(c, sample_ids, data_path):
+    c_uid = c["uid"]
+    files = list(data_path.glob("*.txt"))
+
+    for file in files:
+        fname = file.name
+        print(fname)
+
+        try:
+            sample_name, charge = parse_filename_nslsii(fname)
+        except KeyError as e:
+            print(f"failed to extract sample from {fname}")
+            continue
+
+        sample_id = sample_ids[sample_name]
+
+        with open(file, "r") as f:
+            df = read_wanli(f)
+
+        metadata = {
+            "dataset": "nmc",
+            "fname": fname,
+            "charge": charge,
+            "facility": {"name": "ALS"},
+            "beamline": {"name": "8.0.1"},
+            "element": {"symbol": "Ni", "edge": "L3"},
+            "sample_id": sample_id,
+        }
+
+        if charge["cycle"] == 1 or charge["cycle"] == 10:
+            metadata["energy_offset"] = 0.176
+        elif charge["cycle"] == 2:
+            metadata["energy_offset"] = -0.055
+
+        if "energy_offset" in metadata:
+            df["energy"] = df["energy"] + metadata["energy_offset"]
+
+        c_uid.write_dataframe(
+            df, metadata, specs=["XAS_TEY", "XAS_TFY", "HasBatteryChargeData"]
+        )
+
+        new_node = c_uid.search(Key("fname") == fname).values().first()
+        print(f"{new_node.uid}")
 
 
 def validate_files(c, data_path):
