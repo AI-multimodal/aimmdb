@@ -5,7 +5,12 @@ metadata:
   namespace: aimm
 spec:
   selector:
+    matchLabels:
+      workload.user.cattle.io/workloadselector: deployment-aimm-tiled
   template:
+    metadata:
+      labels:
+        workload.user.cattle.io/workloadselector: deployment-aimm-tiled
     spec:
       affinity: {}
       containers:
@@ -14,8 +19,6 @@ spec:
             - serve
             - config
           env:
-            - name: MONGO_URI
-              value: mongodb://mongodb:27017/aimm?authSource=admin
             - name: ORCID_CLIENT_ID
               value: APP-0ROS9DU5F717F7XN
             - name: TILED_CONFIG
@@ -40,12 +43,6 @@ spec:
                   key: password
                   name: postgres-tiled-pass
                   optional: false
-            - name: MONGO_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  key: password
-                  name: mongopass
-                  optional: false
           image: ghcr.io/bluesky/tiled:v0.1.0a109
           imagePullPolicy: Always
           name: tiled
@@ -67,10 +64,10 @@ spec:
           tty: true
           volumeMounts:
             - mountPath: /config
-              name: vol1
+              name: tiled-config
               readOnly: true
             - mountPath: /data
-              name: vol2
+              name: tiled-data
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
@@ -81,7 +78,7 @@ spec:
         - hostPath:
             path: /global/cfs/projectdirs/m3792/aimm/config
             type: Directory
-          name: vol1
-        - name: vol2
+          name: tiled-config
+        - name: tiled-data
           persistentVolumeClaim:
-            claimName: tiled-data
+            claimName: tiled-pvc
