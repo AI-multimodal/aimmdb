@@ -96,9 +96,12 @@ database:
 uvicorn:
   host: 0.0.0.0
   port: 8000
-validation:
-  XAS: aimmdb.validation:validate_xas_metadata
-  XAS_TFY: aimmdb.validation:validate_xas_tfy
-  XAS_TEY: aimmdb.validation:validate_xas_tey
-  XAS_trans: aimmdb.validation:validate_xas_transmission
-  HasBatteryChargeData: aimmdb.validation:validate_battery_charge_data
+specs:
+  - spec: XAS_TFY
+    validator: aimmdb.validation:validate_xas_tfy
+  - spec: XAS_TEY
+    validator: aimmdb.validation:validate_xas_tey
+  - spec: XAS_trans
+    validator: aimmdb.validation:validate_xas_transmission
+  - spec: HasBatteryChargeData
+    validator: aimmdb.validation:validate_battery_charge_data
