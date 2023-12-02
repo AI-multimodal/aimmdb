@@ -53,7 +53,7 @@ spec:
           tty: true
           volumeMounts:
             - mountPath: /var/lib/postgresql/data
-              name: vol1
+              name: postgres-data-pv
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
@@ -63,5 +63,26 @@ spec:
         - name: postgres-data-pv
           persistentVolumeClaim:
             claimName: postrgres-pvc
-
-
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: aimm
+spec:
+  clusterIP: None
+  clusterIPs:
+    - None
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+    - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+    - name: default
+      port: 42
+      protocol: TCP
+      targetPort: 42
+  selector:
+    workload.user.cattle.io/workloadselector: deployment-aimm-postgres
+  sessionAffinity: None
+  type: ClusterIP

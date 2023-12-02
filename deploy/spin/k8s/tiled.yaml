@@ -82,3 +82,26 @@ spec:
         - name: tiled-data
           persistentVolumeClaim:
             claimName: tiled-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tiled
+  namespace: aimm
+spec:
+  clusterIP: None
+  clusterIPs:
+    - None
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+    - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+    - name: default
+      port: 8000
+      protocol: TCP
+      targetPort: 8000
+  selector:
+    workload.user.cattle.io/workloadselector: deployment-aimm-postgres
+  sessionAffinity: None
+  type: ClusterIP
