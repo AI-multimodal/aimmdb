@@ -102,6 +102,6 @@ spec:
       protocol: TCP
       targetPort: 8000
   selector:
-    workload.user.cattle.io/workloadselector: deployment-aimm-postgres
+    workload.user.cattle.io/workloadselector: deployment-aimm-tiled
   sessionAffinity: None
   type: ClusterIP
