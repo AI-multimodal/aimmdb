@@ -26,4 +26,6 @@ spec:
             path: /
             pathType: ImplementationSpecific
   tls:
-    - secretName: aimm-exp-sep23
+    - hosts:
+        - aimm.lbl.gov
+      secretName: aimm
