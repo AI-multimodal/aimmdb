@@ -14,18 +14,18 @@ spec:
     spec:
       affinity: {}
       containers:
-        - command:
-            - sleep
-            - "999999"
         # - command:
-        #     - tiled
-        #     - serve
-        #     - config
+        #     - sleep
+        #     - "999999"
+        - command:
+            - tiled
+            - serve
+            - config
           env:
             - name: ORCID_CLIENT_ID
               value: APP-0ROS9DU5F717F7XN
             - name: TILED_CONFIG
-              value: /config/main
+              value: /deploy/config/config.yml
             - name: TILED_INTERNAL_CACHE_LOG_LEVEL
               value: INFO
             - name: ORCID_CLIENT_SECRET
@@ -72,10 +72,10 @@ spec:
               readOnly: true
             - mountPath: /data
               name: tiled-data
-            # - mountPath: /opt/venv/share/tiled/templates/index.html   CANNOT DO THIS UNTIL WE MERGE aimmdb PR
-            #   name: aimmdb-github
-            #   subPath: main/deploy/spin/web-frontend/templates/index.html
-            #   readOnly: true
+            - mountPath: /opt/venv/share/tiled/templates/index.html
+              name: aimmdb-github
+              subPath: main/deploy/spin/web-frontend/templates/index.html
+              readOnly: true
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
