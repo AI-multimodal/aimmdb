@@ -29,8 +29,14 @@ trees:
             0000-0003-1779-8007: tiled.access_policies:ALL_ACCESS # Mikhail
             0000-0001-8885-1552: tiled.access_policies:ALL_ACCESS # Inhui
             0000-0003-2516-2586: tiled.access_policies:ALL_ACCESS # Gihyeok
-          # public:
-          #   newville: r
+        admins:
+          - 0000-0002-5947-6017 # Dan
+          - 0000-0002-1539-0297 # Dylan
+          - 0000-0002-2473-0193 # Juan
+        public:
+          - newville
+          - nmc_sim
+          - nmc_sim_structure
 authentication:
   allow_anonymous_access: true
   providers:
