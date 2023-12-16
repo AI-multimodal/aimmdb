@@ -83,7 +83,9 @@ class AIMMCatalog(Node):
             and op_dict["distinct"] == "metadata.sample_id"
         ):
             for k, v in super()._items_slice(start, stop, direction):
-                yield SampleKey(uid=k, name=v.metadata["_tiled"]["sample"]["name"])
+                yield SampleKey(
+                    uid=k, name=v.metadata["_tiled"]["sample"]["name"]
+                )
         elif op_dict["op_enum"] == "distinct" and op_dict["distinct"] == "uid":
             for k, v in super()._items_slice(start, stop, direction):
                 if isinstance(v, XASClient):
@@ -99,7 +101,12 @@ class AIMMCatalog(Node):
             and op_dict["distinct"] == "metadata.sample_id"
         ):
             for k, v in super()._items_slice(start, stop, direction):
-                yield (SampleKey(uid=k, name=v.metadata["_tiled"]["sample"]["name"]), v)
+                yield (
+                    SampleKey(
+                        uid=k, name=v.metadata["_tiled"]["sample"]["name"]
+                    ),
+                    v,
+                )
         elif op_dict["op_enum"] == "distinct" and op_dict["distinct"] == "uid":
             for k, v in super()._items_slice(start, stop, direction):
                 if isinstance(v, XASClient):

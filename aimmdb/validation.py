@@ -6,7 +6,9 @@ from .schemas import BatteryChargeMetadata, ExperimentalXASMetadata
 
 def validate_xas_metadata(metadata, structure_family, structure, spec):
     if structure_family != "dataframe":
-        raise ValidationError(f"structure_family {structure_family} != dataframe")
+        raise ValidationError(
+            f"structure_family {structure_family} != dataframe"
+        )
     try:
         metadata = ExperimentalXASMetadata.parse_obj(metadata)
     except pydantic.ValidationError as e:

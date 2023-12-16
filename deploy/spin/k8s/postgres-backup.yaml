@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: postgres
+  name: postgres-backup
   namespace: aimm
 spec:
   selector:
     matchLabels:
-      workload.user.cattle.io/workloadselector: deployment-aimm-postgres
+      workload.user.cattle.io/workloadselector: deployment-aimm-postgres-backup
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -15,7 +15,7 @@ spec:
   template:
     metadata:
       labels:
-        workload.user.cattle.io/workloadselector: deployment-aimm-postgres
+        workload.user.cattle.io/workloadselector: deployment-aimm-postgres-backup
     spec:
       containers:
         - env:
@@ -29,9 +29,9 @@ spec:
                   key: password
                   name: postgrespass
                   optional: false
-          # command: 
-          #   - "sleep"
-          #   - "999999"
+          command: 
+            - "sleep"
+            - "999999"
           image: postgres:14
           imagePullPolicy: Always
           name: postgres
@@ -70,26 +70,3 @@ spec:
             path: /global/cfs/projectdirs/m3792/aimm/backup
             type: Directory
           name: db-backup
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: postgres
-  namespace: aimm
-spec:
-  clusterIP: None
-  clusterIPs:
-    - None
-  internalTrafficPolicy: Cluster
-  ipFamilies:
-    - IPv4
-  ipFamilyPolicy: SingleStack
-  ports:
-    - name: default
-      port: 42
-      protocol: TCP
-      targetPort: 42
-  selector:
-    workload.user.cattle.io/workloadselector: deployment-aimm-postgres
-  sessionAffinity: None
-  type: ClusterIP

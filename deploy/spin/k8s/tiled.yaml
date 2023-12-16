@@ -15,9 +15,12 @@ spec:
       affinity: {}
       containers:
         - command:
-            - tiled
-            - serve
-            - config
+            - sleep
+            - "999999"
+        # - command:
+        #     - tiled
+        #     - serve
+        #     - config
           env:
             - name: ORCID_CLIENT_ID
               value: APP-0ROS9DU5F717F7XN
@@ -43,7 +46,7 @@ spec:
                   key: password
                   name: postgres-tiled-pass
                   optional: false
-          image: ghcr.io/bluesky/tiled:v0.1.0a109
+          image: ghcr.io/bluesky/tiled:v0.1.0a111
           imagePullPolicy: Always
           name: tiled
           resources: {}
@@ -56,7 +59,7 @@ spec:
                 - ALL
             privileged: false
             readOnlyRootFilesystem: false
-            runAsNonRoot: false
+            runAsNonRoot: true
             runAsUser: 79966
           stdin: true
           terminationMessagePath: /dev/termination-log

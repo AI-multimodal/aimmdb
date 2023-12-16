@@ -34,7 +34,9 @@ class GenericDocument(pydantic.generics.GenericModel, Generic[MetadataT]):
         # actual_structure_type = cls.__annotations__["structure"]  # this is what was filled in for StructureT
         actual_structure = values.get("structure")
         # Given the structure_family, we know what the structure type should be.
-        expected_structure_type = structure_association[values.get("structure_family")]
+        expected_structure_type = structure_association[
+            values.get("structure_family")
+        ]
         if values.get("expected_structure_type") == StructureFamily.node:
             raise Exception(
                 f"{expected_structure_type} is not currently supported as a writable structure"
@@ -51,7 +53,10 @@ class GenericDocument(pydantic.generics.GenericModel, Generic[MetadataT]):
         # with the current data types without getting any conflicts
         # if values.get('data_blob') is None and values.get('data_url') is None:
         #     raise ValueError("Not Valid: data_blob and data_url are both None. Use one of them")
-        if values.get("data_blob") is not None and values.get("data_url") is not None:
+        if (
+            values.get("data_blob") is not None
+            and values.get("data_url") is not None
+        ):
             raise ValueError(
                 "Not Valid: data_blob and data_url contain values. Use just one"
             )
