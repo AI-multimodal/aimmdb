@@ -2,9 +2,9 @@ from collections import defaultdict
 
 from fastapi import HTTPException
 from tiled.adapters.mapping import MapAdapter
+from tiled.queries import In
 from tiled.utils import SpecialUsers
 
-from aimmdb.queries import In
 
 READ = object()  # sentinel
 WRITE = object()  # sentinel
@@ -25,7 +25,8 @@ def require_write_permission(method):
     def inner(self, *args, **kwargs):
         if WRITE not in self.permissions:
             raise HTTPException(
-                status_code=403, detail="principal does not have write permission"
+                status_code=403,
+                detail="principal does not have write permission",
             )
         else:
             return method(self, *args, **kwargs)
@@ -93,7 +94,9 @@ class DatasetAccessPolicy:
         self.provider = provider
 
         # FIXME how to handle a normal user with the admin role?
-        self.access_lists[SpecialUsers.admin] = defaultdict(lambda: {READ, WRITE})
+        self.access_lists[SpecialUsers.admin] = defaultdict(
+            lambda: {READ, WRITE}
+        )
 
         for principal_id, value in access_lists.items():
             if principal_id == "public":
@@ -145,5 +148,7 @@ class DatasetAccessPolicy:
             # should be able to exclude datasets
             return tree.new_variation(principal=principal)
         else:
-            datasets = [k for k, v in principal_access_list.items() if READ in v]
+            datasets = [
+                k for k, v in principal_access_list.items() if READ in v
+            ]
             return tree.search(In("dataset", datasets))

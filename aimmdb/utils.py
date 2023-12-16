@@ -11,7 +11,9 @@ def make_dict(x):
     if isinstance(x, pydantic.BaseModel):
         return {k: make_dict(v) for k, v in x}
     elif dataclasses.is_dataclass(x):
-        return {f.name: make_dict(getattr(x, f.name)) for f in dataclasses.fields(x)}
+        return {
+            f.name: make_dict(getattr(x, f.name)) for f in dataclasses.fields(x)
+        }
     else:
         return x
 
@@ -68,7 +70,10 @@ def get_share_aimmdb_path():
         while path != "/":
             share_tiled = join(path, "share", "aimmdb")
             if exists(
-                join(share_tiled, ".identifying_file_5fde776bf5ee64081be861ce6f02490b")
+                join(
+                    share_tiled,
+                    ".identifying_file_5fde776bf5ee64081be861ce6f02490b",
+                )
             ):
                 # We have the found the right directory,
                 # or one that is trying very hard to pretend to be!

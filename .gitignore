@@ -6,3 +6,4 @@ spike
 *.sqlite
 build
 data
+.vscode/

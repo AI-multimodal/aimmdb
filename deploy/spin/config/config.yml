@@ -1,82 +1,51 @@
 trees:
   - path: /
-    tree: aimmdb.adapters.aimm:AIMMCatalog.from_uri
+    tree: catalog
     args:
-      uri: mongodb://root:${MONGO_PASSWORD}@mongodb:27017/aimm?authSource=admin
-      data_directory: /data
-      dataset_to_specs:
-        ncm:
-          - XAS_TFY
-          - XAS_TEY
-          - XAS_trans
-        newville:
-          - XAS
+      uri: postgresql+asyncpg://tiled:${TILED_DATABASE_PASSWORD}@postgres/tiled
+      writable_storage: /data/aimm/data
+      # dataset_to_specs:
+      #   ncm:
+      #     - XAS_TFY
+      #     - XAS_TEY
+      #     - XAS_trans
     access_control:
-      access_policy: aimmdb.access:DatasetAccessPolicy
+      access_policy: tiled.access_policies:SimpleAccessPolicy
       args:
         provider: orcid
         access_lists:
-          0000-0003-3670-0431: # Joe
-            default: rw
-          0000-0002-5947-6017: # Dan
-            default: r
-            sandbox: rw
-            samples: rw
-          0000-0002-1539-0297: # Dylan
-            default: r
-            sandbox: rw
-            samples: rw
-          0000-0002-3337-2930: # Eli
-            default: r
-            sandbox: rw
-            samples: rw
-          0000-0002-5269-0125: # Alex
-            default: r
-            sandbox: rw
-            samples: rw
-          0000-0003-4351-6085: # Deyu
-            default: r
-            sandbox: rw
-            samples: rw
-          0000-0003-0666-8063: # Wanli
-            default: r
-            sandbox: rw
-            samples: rw
-          0000-0001-5266-5408: # Zhu
-            default: r
-            sandbox: rw
-            samples: rw
-          0000-0002-2473-0193: # Juan
-            default: rw
-            sandbox: rw
-            samples: rw
-          0000-0003-0922-1363: # Maria
-            default: r
-            sandbox: rw
-            samples: rw
-          0000-0002-5181-9513: # Matt
-            default: r
-            sandbox: rw
-            samples: rw
-          0000-0001-5651-8405: # Xiaohui
-            default: r
-            sandbox: rw
-            samples: rw
-          0000-0001-9869-9005: # Fanchen
-            default: r
-            sandbox: rw
-            samples: rw
-          public:
-            newville: r
+            0000-0002-5947-6017: tiled.access_policies:ALL_ACCESS # Dan
+            0000-0002-1539-0297: tiled.access_policies:ALL_ACCESS # Dylan
+            0000-0002-3337-2930: tiled.access_policies:ALL_ACCESS # Eli
+            0000-0002-5269-0125: tiled.access_policies:ALL_ACCESS # Alex
+            0000-0003-4351-6085: tiled.access_policies:ALL_ACCESS # Deyu
+            0000-0003-0666-8063: tiled.access_policies:ALL_ACCESS # Wanli
+            0000-0001-5266-5408: tiled.access_policies:ALL_ACCESS # Zhu
+            0000-0002-2473-0193: tiled.access_policies:ALL_ACCESS # Juan
+            0000-0003-0922-1363: tiled.access_policies:ALL_ACCESS # Maria
+            0000-0002-5181-9513: tiled.access_policies:ALL_ACCESS # Matt
+            0000-0001-5651-8405: tiled.access_policies:ALL_ACCESS # Xiaohui
+            0000-0001-9869-9005: tiled.access_policies:ALL_ACCESS # Fanchen
+            0000-0003-1779-8007: tiled.access_policies:ALL_ACCESS # Mikhail
+            0000-0001-8885-1552: tiled.access_policies:ALL_ACCESS # Inhui
+            0000-0003-2516-2586: tiled.access_policies:ALL_ACCESS # Gihyeok
+        admins:
+          - 0000-0002-5947-6017 # Dan
+          - 0000-0002-1539-0297 # Dylan
+          - 0000-0002-2473-0193 # Juan
+        public:
+          - newville
+          - nmc_sim
+          - nmc_sim_structure
 authentication:
   allow_anonymous_access: true
   providers:
     - provider: orcid
-      authenticator: aimmdb.authentication:AIMMAuthenticator
+      authenticator: tiled.authenticators:OIDCAuthenticator
       args:
         client_id: ${ORCID_CLIENT_ID}
         client_secret: ${ORCID_CLIENT_SECRET}
-        redirect_uri: https://aimm.lbl.gov/api/auth/provider/orcid/login
+        # redirect_uri: https://aimm.lbl.gov/api/auth/provider/orcid/login
         public_keys:
           - kty: "RSA"
             e: "AQAB"
@@ -90,15 +59,15 @@ authentication:
   tiled_admins:
     - provider: orcid
       id: 0000-0003-3670-0431
-database:
-  uri: "postgresql://tiled:${TILED_DATABASE_PASSWORD}@postgres/tiled"
-  pool_size: 5
 uvicorn:
   host: 0.0.0.0
   port: 8000
-validation:
-  XAS: aimmdb.validation:validate_xas_metadata
-  XAS_TFY: aimmdb.validation:validate_xas_tfy
-  XAS_TEY: aimmdb.validation:validate_xas_tey
-  XAS_trans: aimmdb.validation:validate_xas_transmission
-  HasBatteryChargeData: aimmdb.validation:validate_battery_charge_data
+# specs:
+#   - spec: XAS_TFY
+#     validator: aimmdb.validation:validate_xas_tfy
+#   - spec: XAS_TEY
+#     validator: aimmdb.validation:validate_xas_tey
+#   - spec: XAS_trans
+#     validator: aimmdb.validation:validate_xas_transmission
+#   - spec: HasBatteryChargeData
+#     validator: aimmdb.validation:validate_battery_charge_data
