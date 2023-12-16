@@ -66,12 +66,16 @@ spec:
           terminationMessagePolicy: File
           tty: true
           volumeMounts:
-            - mountPath: /config # mount config from the git-sync container
+            - mountPath: /deploy/config # mount config from the git-sync container
               name: aimmdb-github
               subPath: main/deploy/spin/config
               readOnly: true
             - mountPath: /data
               name: tiled-data
+            # - mountPath: /opt/venv/share/tiled/templates/index.html   CANNOT DO THIS UNTIL WE MERGE aimmdb PR
+            #   name: aimmdb-github
+            #   subPath: main/deploy/spin/web-frontend/templates/index.html
+            #   readOnly: true
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler

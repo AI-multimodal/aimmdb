@@ -54,8 +54,8 @@ spec:
           volumeMounts:
             - mountPath: /var/lib/postgresql/data
               name: postgres-data-pv
-            - mountPath: /backup
-              name: db-backup
+            # - mountPath: /backup
+            #   name: db-backup
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
@@ -66,10 +66,10 @@ spec:
         - name: postgres-data-pv
           persistentVolumeClaim:
             claimName: postrgres-pvc
-        - hostPath:
-            path: /global/cfs/projectdirs/m3792/aimm/backup
-            type: Directory
-          name: db-backup
+        # - hostPath:
+        #     path: /global/cfs/projectdirs/m3792/aimm/backup
+        #     type: Directory
+        #   name: db-backup
 ---
 apiVersion: v1
 kind: Service

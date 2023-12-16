@@ -1,3 +1,6 @@
+## Evantualy this will be a chron job to backup regularly. However, this 
+## is not super necessary given how few updates the aimmdb will likely receive
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
