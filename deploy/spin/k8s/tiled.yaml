@@ -66,8 +66,9 @@ spec:
           terminationMessagePolicy: File
           tty: true
           volumeMounts:
-            - mountPath: /config
-              name: tiled-config
+            - mountPath: /config # mount config from the git-sync container
+              name: aimmdb-github
+              subPath: main/deploy/spin/config
               readOnly: true
             - mountPath: /data
               name: tiled-data
@@ -77,14 +78,46 @@ spec:
       securityContext:
         fsGroup: 94721
       terminationGracePeriodSeconds: 30
+      
+    
+      initContainers:
+      # A sidecar container that downloads current main from setttings github repo
+      # and places it into an emptydir volume. This gets picked up by tiled backend
+      # which mountains files 
+      - name: git-sync
+        image: k8s.gcr.io/git-sync:v3.1.6
+        env:
+        - name: GIT_SYNC_REPO
+          value: "https://github.com/AI-multimodal/aimmdb.git"
+        - name: GIT_SYNC_BRANCH
+          value: "main"
+        - name: GIT_SYNC_ROOT
+          value: "/aimmdb-github"
+        - name: GIT_SYNC_DEST
+          value: "main"
+        - name: GIT_SYNC_ONE_TIME
+          value: "true"
+        volumeMounts:
+          - name: aimmdb-github
+            readOnly: false
+            mountPath: /aimmdb-github
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            add:
+            - NET_BIND_SERVICE
+            drop:
+            - ALL
+          privileged: false
+          readOnlyRootFilesystem: false
+          runAsNonRoot: true
+          runAsUser: 79966
       volumes:
-        - hostPath:
-            path: /global/cfs/projectdirs/m3792/aimm/config
-            type: Directory
-          name: tiled-config
         - name: tiled-data
           persistentVolumeClaim:
             claimName: tiled-pvc
+        - name: aimmdb-github
+          emptyDir:
 ---
 apiVersion: v1
 kind: Service
