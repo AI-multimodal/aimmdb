@@ -35,7 +35,6 @@ trees:
           - 0000-0002-2473-0193 # Juan
         public:
           - newville
-          - nmc_electrochem
           - nmc_sim
           - nmc_sim_structure
           - nmc_sim_vasp
