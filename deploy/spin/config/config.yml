@@ -37,6 +37,7 @@ trees:
           - newville
           - nmc_sim
           - nmc_sim_structure
+          - nmc_sim_vasp
 authentication:
   allow_anonymous_access: true
   providers:
