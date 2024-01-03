@@ -46,7 +46,7 @@ spec:
                   key: password
                   name: postgres-tiled-pass
                   optional: false
-          image: ghcr.io/bluesky/tiled:v0.1.0a111
+          image: ghcr.io/bluesky/tiled:v0.1.0a112
           imagePullPolicy: Always
           name: tiled
           resources: {}
