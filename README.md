@@ -3,6 +3,9 @@
 AIMMDB is a data access and search tool for multimodal scientific data built on top of [tiled](https://github.com/bluesky/tiled).
 Currently aimmdb is focused on xray absorption spectroscopy (XAS) data.
 
+## Examples
+Code examples for interacting with the database are maintained in [examples](/examples) folder of this repository.
+
 ## Funding acknowledgement
 
 This research is based upon work supported by the U.S. Department of Energy, Office of Science, Office Basic Energy Sciences, under Award Number FWP PS-030. This research used resources of the Center for Functional Nanomaterials (CFN), which is a U.S. Department of Energy Office of Science User Facility, at Brookhaven National Laboratory under Contract No. DE-SC0012704.
