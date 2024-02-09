@@ -34,6 +34,7 @@ trees:
           - 0000-0002-1539-0297 # Dylan
           - 0000-0002-2473-0193 # Juan
           - 0000-0001-8312-1470 # Runbo
+          - 0000-0003-1579-140X # Monika
         public:
           - newville
           - nmc_sim
