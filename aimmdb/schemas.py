@@ -150,3 +150,33 @@ class BatteryChargeMetadataInternal(pydantic.BaseModel):
 
 class BatteryChargeMetadata(pydantic.BaseModel, extra=pydantic.Extra.allow):
     charge: BatteryChargeMetadataInternal
+
+
+class FEFFcards(pydantic.BaseModel, extra=pydantic.Extra.allow):
+    atoms: float
+    control: int
+    exchange: float
+    title: Optional[str]
+    rpath: int
+    potentials: float
+    xanes: float
+    edge: str
+    scf: float
+    fms: float
+    S02: float
+    corehole: str
+
+class FEFFInputMetadata(pydantic.BaseModel, extra=pydantic.Extra.allow):
+    element: XDIElement
+    measurement_type: MeasurementEnum = pydantic.Field("FEFF", const=True)
+    dataset: str
+    sample_id: str
+    #input_script: str
+
+class FEFFOutputMetadata(pydantic.BaseModel, extra=pydantic.Extra.allow):
+    element: XDIElement
+    measurement_type: MeasurementEnum = pydantic.Field("FEFF", const=True)
+    dataset: str
+    sample_id: str
+    #output_log: str
+
